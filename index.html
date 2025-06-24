@@ -15,8 +15,27 @@
     #result { margin-top: 20px; color: red; font-size: 1.2em; text-align: center; }
     .warning { margin-top: 30px; color: #ffc107; font-size: 0.9em; text-align: center; }
     footer { margin-top: 40px; text-align: center; font-size: 0.75em; color: #bbb; }
-    .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); }
-    .modal-content { background: #222; padding: 20px; border-radius: 10px; margin: 30vh auto 0 auto; width: 90%; max-width: 500px; text-align: left; color: #eee; }
+    .modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.7);
+  overflow-y: auto;
+}
+    .modal-content {
+  background: #222;
+  padding: 20px;
+  border-radius: 5px;
+  width: 90%;
+  max-width: 500px;
+  text-align: left;
+  color: #eee;
+  margin: 20px auto;
+}
     .modal-content button { margin-top: 15px; background: #ff5252; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; width: 100%; }
     .modal-content h1, h2, h3 { color: #ffcc00; }
     .modal-content ul, ol { margin-left: 20px; }
@@ -28,10 +47,10 @@
   <label for="insertType">Werkzeugeinsatz</label>
   <select id="insertType">
     <option value="">-- auswählen --</option>
-    <option value="Joker L">Joker L</option>
-    <option value="Joker XL">Joker XL</option>
-    <option value="Joker XXL">Joker XXL</option>
-    <option value="Joker 3XL">Joker 3XL</option>
+    <option value="Joker L">Joker L (14x18)</option>
+    <option value="Joker XL">Joker XL (14x18)</option>
+    <option value="Joker XXL">Joker XXL (14x18)</option>
+    <option value="Joker 3XL">Joker 3XL (14x18)</option>
   </select>
 
   <label for="sw">Schlüsselweite</label>
@@ -46,31 +65,38 @@
     <option value="X7">WERA X7 (20–100 Nm)</option>
   </select>
 
-  <label for="ma">"Ist" Drehmoment in Nm</label>
+  <label for="ma">Drehmoment in Nm</label>
   <input type="number" id="ma" min="0">
 
-  <button onclick="calculate()">Berechnen</button>
+  <button onclick="calculate()">Jetzt berechnen</button>
   <button onclick="showAddToHome()">Zur Startseite hinzufügen</button>
   <button onclick="showChangelog()">📋 Changelog anzeigen</button>
 
   <div id="result"></div>
 
   <div class="warning">
-    ⚠️ Achtung: Werte außerhalb der Schlüsselbereiche können zu falscher Anwendung führen!<br />
-    Die Korrektur ist notwendig, da Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite und Hebelarm des Drehmomentschlüssels Einfluss auf das Ergebnis haben.
+    ⚠️Achtung<br />
+	Werte außerhalb der Schlüsselbereiche können zu dauerthaften Schäden führen!<br />
+    Bitte beachten Sie, dass das Überschreiten der zulässigen Drehmoment- oder Schlüsselweitenbereiche irreversible Schäden verursachen kann.<br />
+	<br />
+	Da die Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite sowie der effektive Hebelarm des Drehmomentschlüssels das Messergebnis maßgeblich beeinflussen<br />
+	ist deshalb eine Korrektur erforderlich.<br />
+	<br />___________________________❗❗❗❗__________________________<br />
+	Die Verwendung dieses Tools erfolgt ausschließlich auf eigenes Risiko, und für daraus resultierende Schäden wird keinerlei Haftung übernommen.
+	<br />______________________________________________________________<br />
   </div>
 
   <footer>Erstellt durch Timo Burian – HDT GmbH, 46242 Bottrop</footer>
 
   <div class="modal" id="modal" onclick="this.style.display='none'">
-    <div class="modal-content" style="position: relative;">
+    <div class="modal-content">
       <div id="modalText"></div>
       <button onclick="document.getElementById('modal').style.display='none'">OK</button>
     </div>
   </div>
 
   <div class="modal" id="modalChangelog" onclick="this.style.display='none'">
-    <div class="modal-content" style="position: relative;">
+    <div class="modal-content">
       <div id="modalChangelogText" style="max-height: 60vh; overflow-y: auto;"></div>
       <button onclick="document.getElementById('modalChangelog').style.display='none'">Schließen</button>
     </div>
@@ -103,7 +129,7 @@
         return;
       }
       sw.disabled = false;
-      sw.innerHTML = '<option value="">-- SW auswählen --</option>';
+      sw.innerHTML = '<option value="">-- auswählen --</option>';
       Object.keys(sizes[type]).forEach(val => {
         const opt = document.createElement("option");
         opt.value = val;
