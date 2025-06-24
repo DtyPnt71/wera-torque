@@ -1,234 +1,143 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <link rel="manifest" href="manifest.json">
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('service-worker.js').then(function(reg) {
-          console.log('ServiceWorker registered:', reg);
-        });
-      });
-    }
-  </script>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Drehmomentkorrektur WERA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      background-color: #121212;
-      color: #ffffff;
-      font-family: 'Segoe UI', sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 1.8em;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-
-    select, input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 8px;
-      font-size: 1em;
-      border: none;
-      background-color: #1e1e1e;
-      color: white;
-    }
-
-    button {
-      background-color: #ff5252;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #ff7979;
-    }
-
-    #result {
-      margin-top: 25px;
-      color: red;
-      font-weight: bold;
-      font-size: 1.4em;
-      text-align: center;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.6);
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background-color: #222;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 20% auto;
-      width: 80%;
-      max-width: 400px;
-      text-align: center;
-      color: white;
-    }
-
-    .modal-content button {
-      margin-top: 15px;
-      background-color: #ff5252;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      color: white;
-    }
-
-    footer {
-      margin-top: 40px;
-      text-align: center;
-      font-size: 0.7em;
-      color: #C0C0C0;
-    }
-
-    .warning {
-      margin-top: 30px;
-      background-color: rgba(255,193,7,0.1);
-      color: #ffc107;
-      border-left: 4px solid #ffc107;
-      padding: 12px;
-      border-radius: 6px;
-      text-align: center;
-      font-size: 0.9em;
-    }
+    body { background: #121212; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px; max-width: 480px; margin: auto;}
+    h1 { text-align: center; margin-bottom: 28px;}
+    .form-group { margin-bottom: 20px;}
+    label { display: block; font-weight: bold; margin-bottom: 6px;}
+    select, input { width: 100%; padding: 11px; font-size: 1em; border-radius: 8px; border: none; margin-top: 5px; background: #1e1e1e; color: #fff;}
+    button { width: 100%; margin-top: 18px; background: #ff5252; color: #fff; border: none; padding: 13px; font-size: 1em; border-radius: 10px; cursor: pointer;}
+    button:hover { background: #ff7979;}
+    #result { margin-top: 22px; color: red; font-weight: bold; font-size: 1.4em; text-align: center;}
+    .warning { margin-top: 30px; padding: 12px; background: rgba(255,193,7,0.1); color: #ffc107; font-size: 0.95em; text-align: center; border-left: 4px solid #ffc107; border-radius: 6px;}
+    footer { margin-top: 40px; text-align: center; color: #C0C0C0; font-size: 0.8em;}
+    .modal { display:none; position:fixed; z-index:1000; left:0; top:0; width:100vw; height:100vh; background:rgba(0,0,0,0.7);}
+    .modal-content { background:#222; color:#fff; margin: 30vh auto 0 auto; padding: 24px; border-radius: 12px; width:90%; max-width:370px; text-align:center;}
+    .modal-content button { background:#ff5252; margin-top:18px; border-radius:8px;}
+    .modal-content button:hover { background:#ff7979;}
   </style>
 </head>
 <body>
+  <h1>Drehmomentkorrektur WERA</h1>
 
-<h1>Drehmomentkorrektur WERA</h1>
-
-<label for="insertType">Werkzeugeinsatz</label>
-<select id="insertType">
-  <option value="">-- auswählen --</option>
-  <option value="Joker L">Joker L</option>
-  <option value="Joker XL">Joker XL</option>
-  <option value="Joker XXL">Joker XXL</option>
-  <option value="Joker 3XL">Joker 3XL</option>
-</select>
-
-<label for="sw">Schlüsselweite</label>
-<select id="sw">
-  <option value="">-- zuerst Einsatz wählen --</option>
-</select>
-
-<label for="keyType">Drehmomentschlüssel</label>
-<select id="keyType">
-  <option value="">-- auswählen --</option>
-  <option value="X4">WERA X4 (40–200 Nm)</option>
-  <option value="X7">WERA X7 (20–100 Nm)</option>
-</select>
-
-<label for="ma">"Ist" Drehmoment in Nm</label>
-<input type="number" id="ma" min="0" />
-
-<button onclick="calculate()">Berechnen</button>
-<button onclick="showAddToHome()">Zur Startseite hinzufügen</button>
-
-<div id="result"></div>
-
-<div class="warning">
-  ⚠️ Achtung: Werte außerhalb der Schlüsselbereiche können zu falscher Anwendung führen!<br>
-  Die Korrektur ist notwendig, da Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite und Hebelarm des Drehmomentschlüssels Einfluss auf das Ergebnis haben.
-</div>
-
-<footer>
-  Erstellt durch Timo Burian – HDT GmbH, 46242 Bottrop
-</footer>
-
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <div id="modalText"></div>
-    <button onclick="closeModal()">OK</button>
+  <div class="form-group">
+    <label for="insertType">Werkzeugeinsatz</label>
+    <select id="insertType">
+      <option value="">-- auswählen --</option>
+      <option value="Joker L">Joker L</option>
+      <option value="Joker XL">Joker XL</option>
+      <option value="Joker XXL">Joker XXL</option>
+      <option value="Joker 3XL">Joker 3XL</option>
+    </select>
   </div>
-</div>
+  <div class="form-group">
+    <label for="sw">Schlüsselweite</label>
+    <select id="sw" disabled>
+      <option value="">-- zuerst Werkzeugeinsatz wählen --</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="keyType">Drehmomentschlüssel</label>
+    <select id="keyType">
+      <option value="">-- auswählen --</option>
+      <option value="X4">WERA X4 (40–200 Nm)</option>
+      <option value="X7">WERA X7 (20–100 Nm)</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label for="ma">"Ist" Drehmoment in Nm</label>
+    <input type="number" id="ma" min="0" />
+  </div>
+  <button id="calcBtn">Berechnen</button>
+  <button id="addToHomeBtn" style="margin-top:10px;">Zur Startseite hinzufügen</button>
+  <div id="result"></div>
+  <div class="warning">
+    ⚠️ <strong>Achtung:</strong> Werte außerhalb der Schlüsselbereiche können zu falscher Anwendung führen!<br>
+    Die Korrektur ist notwendig, da Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite und Hebelarm des Drehmomentschlüssels Einfluss auf das Ergebnis haben.
+  </div>
+  <footer>
+    Erstellt durch Timo Burian – HDT GmbH, 46242 Bottrop
+  </footer>
 
-<script>
-  const sizes = {
-    "Joker L": { "16": 44.6, "17": 46.7, "18": 48.2, "19": 49.1 },
-    "Joker XL": { "19": 51.6, "20": 53.6, "21": 55.4, "22": 56.7, "23": 56.7, "24": 56.7 },
-    "Joker XXL": { "24": 62.2, "27": 68, "30": 70.2, "32": 70.4 },
-    "Joker 3XL": { "32": 77, "34": 79, "36": 80, "41": 81.5 }
-  };
-
-  const data = {
-    X4: { Lk: 435, Sk: 25.5, min: 40, max: 200 },
-    X7: { Lk: 343, Sk: 25.5, min: 20, max: 100 }
-  };
-
-  document.getElementById("insertType").addEventListener("change", function() {
-    const type = this.value;
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div id="modalText"></div>
+      <button onclick="document.getElementById('modal').style.display='none'">OK</button>
+    </div>
+  </div>
+  <script>
+    // Schlüsselweiten-Daten:
+    const sizes = {
+      "Joker L": { "16": 44.6, "17": 46.7, "18": 48.2, "19": 49.1 },
+      "Joker XL": { "19": 51.6, "20": 53.6, "21": 55.4, "22": 56.7, "23": 56.7, "24": 56.7 },
+      "Joker XXL": { "24": 62.2, "27": 68, "30": 70.2, "32": 70.4 },
+      "Joker 3XL": { "32": 77, "34": 79, "36": 80, "41": 81.5 }
+    };
+    // Drehmomentschlüssel-Daten:
+    const data = {
+      X4: { Lk: 435, Sk: 25.5, min: 40, max: 200 },
+      X7: { Lk: 343, Sk: 25.5, min: 20, max: 100 }
+    };
+    // Referenzen auf die Felder:
+    const insertType = document.getElementById("insertType");
     const swSelect = document.getElementById("sw");
-    swSelect.innerHTML = '<option value="">-- SW auswählen --</option>';
-    if (sizes[type]) {
-      Object.entries(sizes[type]).forEach(([key, val]) => {
-        const opt = document.createElement("option");
-        opt.value = key;
-        opt.textContent = `SW ${key}`;
+    insertType.addEventListener("change", function() {
+      const einsatz = this.value;
+      swSelect.innerHTML = '';
+      if(!einsatz || !sizes[einsatz]) {
+        swSelect.disabled = true;
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = '-- zuerst Werkzeugeinsatz wählen --';
+        swSelect.appendChild(opt);
+        return;
+      }
+      swSelect.disabled = false;
+      const opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = '-- SW auswählen --';
+      swSelect.appendChild(opt0);
+      Object.keys(sizes[einsatz]).forEach(sw=>{
+        const opt = document.createElement('option');
+        opt.value = sw;
+        opt.textContent = `SW ${sw}`;
         swSelect.appendChild(opt);
       });
+    });
+    // MODAL:
+    function showModal(txt) {
+      document.getElementById('modalText').innerText = txt;
+      document.getElementById('modal').style.display = 'block';
     }
-  });
-
-  function showModal(message) {
-    document.getElementById("modalText").innerText = message;
-    document.getElementById("modal").style.display = "block";
-  }
-
-  function closeModal() {
-    document.getElementById("modal").style.display = "none";
-  }
-
-  function showAddToHome() {
-    showModal("📲 So fügst du die App zum Startbildschirm hinzu:
-
-📱 Android: Menü > 'Zum Startbildschirm hinzufügen'
-🍏 iOS: Teilen-Symbol > 'Zum Home-Bildschirm'");
-  }
-
-  function calculate() {
-    const insert = document.getElementById("insertType").value;
-    const sw = document.getElementById("sw").value;
-    const key = document.getElementById("keyType").value;
-    const ma = parseFloat(document.getElementById("ma").value);
-
-    if (!insert || !sw || !key || isNaN(ma)) {
-      showModal("Bitte fülle alle Felder korrekt aus.");
-      return;
-    }
-
-    const S = sizes[insert][sw];
-    const { Sk, Lk, min, max } = data[key];
-    const Ms = ma * Lk / (Lk + (S - Sk));
-    const rounded = Math.round(Ms * 100) / 100;
-
-    if (rounded < min || rounded > max) {
-      showModal(`Das Ergebnis (${rounded} Nm) liegt außerhalb des Bereichs vom WERA ${key}.`);
-    }
-
-    document.getElementById("result").innerText = `korrigierter Wert: ${rounded} Nm`;
-  }
-</script>
-
+    // Button "Berechnen"
+    document.getElementById('calcBtn').addEventListener('click', function() {
+      const einsatz = insertType.value;
+      const sw = swSelect.value;
+      const key = document.getElementById("keyType").value;
+      const ma = parseFloat(document.getElementById("ma").value);
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerText = "";
+      if(!einsatz || !sw || !key || isNaN(ma)) {
+        showModal("Bitte fülle alle Felder korrekt aus.");
+        return;
+      }
+      const S = sizes[einsatz][sw];
+      const { Sk, Lk, min, max } = data[key];
+      const Ms = ma * Lk / (Lk + (S - Sk));
+      const rounded = Math.round(Ms * 100) / 100;
+      if (rounded < min || rounded > max) {
+        showModal(`Das Ergebnis (${rounded} Nm) liegt außerhalb des Bereichs vom WERA ${key}.`);
+      }
+      resultDiv.innerText = `korrigierter Wert: ${rounded} Nm`;
+    });
+    // Button "Zum Startbildschirm hinzufügen"
+    document.getElementById('addToHomeBtn').addEventListener('click', function() {
+      showModal("📲 So fügst du die App zum Startbildschirm hinzu:\n\n📱 Android: Menü > 'Zum Startbildschirm hinzufügen'\n🍏 iOS: Teilen-Symbol > 'Zum Home-Bildschirm'");
+    });
+  </script>
 </body>
 </html>
