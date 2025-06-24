@@ -1,2 +1,2 @@
-# wera-torque
-Drehmoment Korrektur
+# Drehmomentrechner für WERA Click-Torque Werkzeug
+-
