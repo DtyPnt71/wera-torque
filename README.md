@@ -21,14 +21,14 @@ Optimiert für WERA X4 & X7 Drehmomentschlüssel – inklusive App-Funktionalit�
 
 ## 🆕 Changelog
 
-### [v1.0.0] – 2025-06-24
-- Erste stabile Veröffentlichung
+### [v1.0.2] – 2025-06-24
 - Auswahlfelder vollständig dynamisch
 - Berechnung gemäß Formel: `Ms = Ma × Lk / (Lk + (S − Sk))`
 - Modal-Warnsystem für Fehler & Hinweise
 - Layout optimiert für mobile Nutzung
 - **PWA-Integration mit Manifest & Service Worker**
 - Support für Add-to-Home auf Android und iOS über Modal
+- Warnhinweis hinzugefügt
 
 ---
 
