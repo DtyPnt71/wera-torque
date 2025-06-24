@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Drehmomentkorrektur WERA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #121212;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    @media (max-width: 1024px) { body { font-size: 1.1em; } }
+    @media (max-width: 768px) { body { font-size: 1.2em; } }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    select, input, button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: none;
+      margin-top: 5px;
+    }
+
+    select, input {
+      background-color: #1e1e1e;
+      color: #fff;
+    }
+
+    button {
+      background-color: #ff5252;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #ff7979;
+    }
+
+    #result {
+      margin-top: 25px;
+      color: red;
+      font-weight: bold;
+      font-size: 1.5em;
+      text-align: center;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #C0C0C0;
+      font-size: 0.6em;
+    }
+
+    .warning {
+      margin-top: 30px;
+      padding: 12px;
+      background-color: rgba(255, 193, 7, 0.1);
+      color: #ffc107;
+      font-size: 0.9em;
+      text-align: center;
+      border-left: 4px solid #ffc107;
+      border-radius: 6px;
+      line-height: 1.4;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #222;
+      color: #fff;
+      margin: 20% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .close-btn {
+      background: #ff5252;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      background: #ff7979;
+    }
+  </style>
+</head>
+<body>
+  <h1>Drehmomentkorrektur WERA</h1>
+
+  <div class="form-group">
+    <label for="insertType">Werkzeugeinsatz</label>
+    <select id="insertType">
+      <option value="">-- auswählen --</option>
+      <option value="Joker L">Joker L</option>
+      <option value="Joker XL">Joker XL</option>
+      <option value="Joker XXL">Joker XXL</option>
+      <option value="Joker 3XL">Joker 3XL</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="sw">Schlüsselweite</label>
+    <select id="sw">
+      <option value="">-- zuerst Werkzeugeinsatz wählen --</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="keyType">Drehmomentschlüssel</label>
+    <select id="keyType">
+      <option value="">-- auswählen --</option>
+      <option value="X4">WERA X4 (40–200 Nm)</option>
+      <option value="X7">WERA X7 (20–100 Nm)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="ma">"Ist" Drehmoment in Nm</label>
+    <input type="number" id="ma" min="0">
+  </div>
+
+  <button onclick="calculate()">Berechnen</button>
+  <button onclick="addToHome()">Zur Startseite hinzufügen</button>
+
+  <div id="result"></div>
+
+  <div class="warning">
+    ⚠️ <strong>Achtung:</strong> Werte außerhalb der Schlüsselbereiche können zu dauerhaften Schäden führen!<br><br>
+    Die Korrektur ist notwendig, da Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite und Hebelarm des Drehmomentschlüssels Einfluss auf das Ergebnis haben.
+  </div>
+
+  <footer>
+    Erstellt durch Timo Burian – HDT GmbH, 46242 Bottrop
+  </footer>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div id="modalText">Fehlermeldung</div>
+      <button class="close-btn" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const sizes = {
+      "Joker L": { "16": 44.6, "17": 46.7, "18": 48.2, "19": 49.1 },
+      "Joker XL": { "19": 51.6, "20": 53.6, "21": 55.4, "22": 56.7, "23": 56.7, "24": 56.7 },
+      "Joker XXL": { "24": 62.2, "27": 68, "30": 70.2, "32": 70.4 },
+      "Joker 3XL": { "32": 77, "34": 79, "36": 80, "41": 81.5 }
+    };
+
+    const data = {
+      X4: { Lk: 435, Sk: 25.5, min: 40, max: 200 },
+      X7: { Lk: 343, Sk: 25.5, min: 20, max: 100 }
+    };
+
+    const insertType = document.getElementById("insertType");
+    const swSelect = document.getElementById("sw");
+
+    insertType.addEventListener("change", () => {
+      const type = insertType.value;
+      swSelect.innerHTML = '<option value="">-- SW auswählen --</option>';
+      if (sizes[type]) {
+        Object.keys(sizes[type]).forEach(key => {
+          const opt = document.createElement("option");
+          opt.value = key;
+          opt.textContent = `SW ${key}`;
+          swSelect.appendChild(opt);
+        });
+      }
+    });
+
+    function showModal(msg) {
+      document.getElementById("modalText").textContent = msg;
+      document.getElementById("modal").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+
+    function calculate() {
+      const key = document.getElementById("keyType").value;
+      const ma = parseFloat(document.getElementById("ma").value);
+      const sw = document.getElementById("sw").value;
+      const insert = document.getElementById("insertType").value;
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerText = "";
+
+      if (!key || isNaN(ma) || sw === "" || insert === "") {
+        showModal("Bitte fülle alle Felder korrekt aus.");
+        return;
+      }
+
+      const S = sizes[insert][sw];
+      if (!S) {
+        showModal("Unbekannte Schlüsselweite.");
+        return;
+      }
+
+      const { Sk, Lk, min, max } = data[key];
+      const Ms = ma * Lk / (Lk + (S - Sk));
+      const rounded = Math.round(Ms * 100) / 100;
+
+      if (rounded < min || rounded > max) {
+        showModal(`Das Ergebnis (${rounded} Nm) liegt außerhalb des Bereichs vom WERA ${key}. Bitte anderen Drehmomentschlüssel verwenden.`);
+      }
+
+      resultDiv.innerText = `korrigierter Wert: ${rounded} Nm`;
+    }
+
+    function addToHome() {
+      showModal("Zum Startbildschirm hinzufügen:
+
+Android: Menü > 'Zum Startbildschirm hinzufügen'
+
+iOS: Teilen-Symbol > 'Zum Home-Bildschirm'");
+    }
+  </script>
+</body>
+</html>
