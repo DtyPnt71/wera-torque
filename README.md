@@ -1,4 +1,4 @@
-# 🔧 Drehmomentkorrektur WERA – PWA-Tool
+# 🔧 Drehmomentkorrektur WERA
 
 Ein modernes, mobilfähiges Berechnungstool zur **Korrektur von Drehmomentwerten bei Werkzeugeinsätzen mit variabler Schlüsselweite**.  
 Optimiert für WERA X4 & X7 Drehmomentschlüssel – inklusive App-Funktionalität über Progressive Web App (PWA).
