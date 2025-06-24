@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Drehmomentkorrektur WERA</title>
   <link rel="manifest" href="manifest.json" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     body { background: #121212; color: #fff; font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
     h1 { text-align: center; }
@@ -15,8 +16,10 @@
     .warning { margin-top: 30px; color: #ffc107; font-size: 0.9em; text-align: center; }
     footer { margin-top: 40px; text-align: center; font-size: 0.75em; color: #bbb; }
     .modal { display: none; position: fixed; z-index: 999; left: 0; top: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.7); }
-    .modal-content { background: #222; padding: 20px; border-radius: 10px; margin: 30vh auto 0 auto; width: 90%; max-width: 400px; text-align: center; }
-    .modal-content button { margin-top: 15px; background: #ff5252; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; }
+    .modal-content { background: #222; padding: 20px; border-radius: 10px; margin: 30vh auto 0 auto; width: 90%; max-width: 500px; text-align: left; color: #eee; }
+    .modal-content button { margin-top: 15px; background: #ff5252; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; width: 100%; }
+    .modal-content h1, h2, h3 { color: #ffcc00; }
+    .modal-content ul, ol { margin-left: 20px; }
   </style>
 </head>
 <body>
@@ -25,10 +28,10 @@
   <label for="insertType">Werkzeugeinsatz</label>
   <select id="insertType">
     <option value="">-- auswählen --</option>
-    <option value="Joker L">Joker L 14x18</option>
-    <option value="Joker XL">Joker XL 14x18</option>
-    <option value="Joker XXL">Joker XXL 14x18</option>
-    <option value="Joker 3XL">Joker 3XL 14x18</option>
+    <option value="Joker L">Joker L</option>
+    <option value="Joker XL">Joker XL</option>
+    <option value="Joker XXL">Joker XXL</option>
+    <option value="Joker 3XL">Joker 3XL</option>
   </select>
 
   <label for="sw">Schlüsselweite</label>
@@ -43,33 +46,32 @@
     <option value="X7">WERA X7 (20–100 Nm)</option>
   </select>
 
-  <label for="ma">Drehmoment in Nm</label>
+  <label for="ma">"Ist" Drehmoment in Nm</label>
   <input type="number" id="ma" min="0">
 
-  <button onclick="calculate()">Jetzt berechnen </button>
-  <button onclick="showAddToHome()">Tool zur Startseite hinzufügen</button>
+  <button onclick="calculate()">Berechnen</button>
+  <button onclick="showAddToHome()">Zur Startseite hinzufügen</button>
   <button onclick="showChangelog()">📋 Changelog anzeigen</button>
 
   <div id="result"></div>
 
   <div class="warning">
-    ⚠️ Achtung: Werte außerhalb der Schlüsselbereiche können zu dauerhaften Schäden führen!<br />
-    Die Korrektur ist notwendig, da Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite und Hebelarm des Drehmomentschlüssels Einfluss auf das Ergebnis haben.<br />
-	Die verwendung erfolgt unter eigener Verantwortung. Es erfolgt keine Haftung bei Schäden!
+    ⚠️ Achtung: Werte außerhalb der Schlüsselbereiche können zu falscher Anwendung führen!<br />
+    Die Korrektur ist notwendig, da Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite und Hebelarm des Drehmomentschlüssels Einfluss auf das Ergebnis haben.
   </div>
 
   <footer>Erstellt durch Timo Burian – HDT GmbH, 46242 Bottrop</footer>
 
-  <div class="modal" id="modal">
-    <div class="modal-content">
+  <div class="modal" id="modal" onclick="this.style.display='none'">
+    <div class="modal-content" style="position: relative;">
       <div id="modalText"></div>
       <button onclick="document.getElementById('modal').style.display='none'">OK</button>
     </div>
   </div>
 
-  <div class="modal" id="modalChangelog">
-    <div class="modal-content">
-      <div id="modalChangelogText" style="text-align:left; max-height:300px; overflow:auto; white-space:pre-wrap; font-size:0.9em;"></div>
+  <div class="modal" id="modalChangelog" onclick="this.style.display='none'">
+    <div class="modal-content" style="position: relative;">
+      <div id="modalChangelogText" style="max-height: 60vh; overflow-y: auto;"></div>
       <button onclick="document.getElementById('modalChangelog').style.display='none'">Schließen</button>
     </div>
   </div>
@@ -101,7 +103,7 @@
         return;
       }
       sw.disabled = false;
-      sw.innerHTML = '<option value="">-- Schlüsselweite auswählen --</option>';
+      sw.innerHTML = '<option value="">-- SW auswählen --</option>';
       Object.keys(sizes[type]).forEach(val => {
         const opt = document.createElement("option");
         opt.value = val;
@@ -116,7 +118,7 @@
     }
 
     function showAddToHome() {
-      showModal("📲 So fügst du die App zum Startbildschirm hinzu:\n\n📱 Android: Menü > 'Zum Startbildschirm hinzufügen'\n🍏 iOS: Teilen-Symbol > 'Zum Home-Bildschirm'");
+      showModal("📲 So fügst du die App zum Startbildschirm hinzu:\n\n📱 Android: Menü > 'Zum Startbildschirm hinzufügen'\n🍏 iOS: Teilen-Symbol > 'Zum Homebildschirm'");
     }
 
     function calculate() {
@@ -148,7 +150,7 @@
       fetch("https://raw.githubusercontent.com/DtyPnt71/wera-torque/main/README.md")
         .then(response => response.text())
         .then(data => {
-          document.getElementById("modalChangelogText").innerText = data;
+          document.getElementById("modalChangelogText").innerHTML = marked.parse(data);
           document.getElementById("modalChangelog").style.display = "block";
         })
         .catch(() => {
