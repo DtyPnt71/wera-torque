@@ -32,13 +32,6 @@ Optimiert für WERA X4 & X7 Drehmomentschlüssel – inklusive App-Funktionalit�
 
 ---
 
-## 💻 Deployment
-
-Einfach das Repository als ZIP auf [Netlify Drop](https://app.netlify.com/drop) hochladen.  
-Die App ist direkt online & als Web-App installierbar.
-
----
-
 ## 🛠 Verwendete Technologien
 
 - HTML5, CSS3
