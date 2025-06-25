@@ -64,4 +64,4 @@ Das bedeutet:
 
 👉 [Mehr zur Lizenz](https://creativecommons.org/licenses/by-nc-nd/4.0/)
 
-© 2025 Timo Burian – HDT GmbH Bottrop. Alle Rechte vorbehalten.
+© 2025 Timo Burian. Alle Rechte vorbehalten.
