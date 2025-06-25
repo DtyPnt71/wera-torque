@@ -26,7 +26,7 @@ Ein modernes, mobilfähiges Berechnungstool zur **Korrektur von Drehmomentwerten
 - Intro + Ladebalken
 - Ergebsnisanzeige hervorgehoben
 - **Reset-Button** Setzt die Werte zurück
-- **Automatische Versionanzeigen**
+- **Automatische Versionsanzeige**
 - Anzeige für Smartphone / Tablet optimiert
 - Nutzungslizenz definiert
 
