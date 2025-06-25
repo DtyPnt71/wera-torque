@@ -12,8 +12,8 @@ Ein modernes, mobilfähiges Berechnungstool zur **Korrektur von Drehmomentwerten
 ✅ Bereichsprüfung je nach Drehmomentschlüssel (X4 oder X7)  
 ✅ UI mit responsivem Layout für PC, Tablet und Smartphone  
 ✅ Warnungen bei ungültiger Eingabe oder Werte außerhalb der Toleranz  
-✅ **PWA-Funktion:** "Zum Homebildschirm hinzufügen"-Button für Android, iOS & Windows  
-✅ Modal-Fehlermeldungen 
+✅ **PWA-Funktion:** "App installieren"-Button für Android, iOS & Windows  
+✅ Modale-Fehlermeldungen 
 ✅ Unterstützt Netlify (Drop-Deployment)
 
 ---
