@@ -103,7 +103,7 @@ window.addEventListener("load", () => {
     if (intro) {
       intro.style.display = "none";
     }
-  }, 2500); Introlänge 2500 = 2,5 sek
+  }, 5000); Introlänge 2500 = 2,5 sek
 });
 
 function resetFields() {
