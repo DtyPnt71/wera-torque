@@ -31,11 +31,11 @@ Ein modernes, mobilfähiges Berechnungstool zur **Korrektur von Drehmomentwerten
 - Nutzungslizenz definiert
 
 ````
-### [v1.0.1] – 2025-06-24``
-- Auswahlfelder vollständig dynamisch``
+### old [v1.0.1] – 2025-06-24
+- Auswahlfelder vollständig dynamisch
 - Berechnung gemäß Formel: `Ms = Ma × Lk / (Lk + (S − Sk))
-- Modal-Warnsystem für Fehler & Hinweise``
-- Layout optimiert für mobile Nutzung``
+- Modal-Warnsystem für Fehler & Hinweise
+- Layout optimiert für mobile Nutzung
 - **PWA-Integration mit Manifest & Service Worker**
 - Support für Add-to-Home auf Android und iOS über Modal
 - Warnhinweis hinzugefügt
