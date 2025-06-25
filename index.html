@@ -1,12 +1,13 @@
 <!DOCTYPE html>
+
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Drehmomentkorrektur WERA</title>
-  <link rel="manifest" href="manifest.json" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Drehmomentkorrektur WERA</title>
+<link href="manifest.json" rel="manifest"/>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
     body { background: #121212; color: #fff; font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
     h1 { text-align: center; }
     label { display: block; margin-top: 15px; font-weight: bold; }
@@ -40,69 +41,64 @@
     .modal-content h1, h2, h3 { color: #ffcc00; }
     .modal-content ul, ol { margin-left: 20px; }
   </style>
+<link href="styles.css" rel="stylesheet"/>
 </head>
-<body>
-  <h1>Drehmomentkorrektur WERA</h1>
-
-  <label for="insertType">Werkzeugeinsatz</label>
-  <select id="insertType">
-    <option value="">-- auswählen --</option>
-    <option value="Joker L">Joker L (14x18)</option>
-    <option value="Joker XL">Joker XL (14x18)</option>
-    <option value="Joker XXL">Joker XXL (14x18)</option>
-    <option value="Joker 3XL">Joker 3XL (14x18)</option>
-  </select>
-
-  <label for="sw">Schlüsselweite</label>
-  <select id="sw" disabled>
-    <option value="">-- zuerst Werkzeugeinsatz wählen --</option>
-  </select>
-
-  <label for="keyType">Drehmomentschlüssel</label>
-  <select id="keyType">
-    <option value="">-- auswählen --</option>
-    <option value="X4">WERA X4 (40–200 Nm)</option>
-    <option value="X7">WERA X7 (20–100 Nm)</option>
-  </select>
-
-  <label for="ma">Drehmoment in Nm</label>
-  <input type="number" id="ma" min="0">
-
-  <button onclick="calculate()">Jetzt berechnen</button>
-  <button onclick="showAddToHome()">Zur Startseite hinzufügen</button>
-  <button onclick="showChangelog()">📋 Changelog anzeigen</button>
-
-  <div id="result"></div>
-
-  <div class="warning">
-    ⚠️Achtung<br />
-	Werte außerhalb der Schlüsselbereiche können zu dauerthaften Schäden führen!<br />
-    Bitte beachten Sie, dass das Überschreiten der zulässigen Drehmoment- oder Schlüsselweitenbereiche irreversible Schäden verursachen kann.<br />
-	<br />
-	Da die Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite sowie der effektive Hebelarm des Drehmomentschlüssels das Messergebnis maßgeblich beeinflussen<br />
-	ist deshalb eine Korrektur erforderlich.<br />
-	<br />___________________________❗❗❗❗__________________________<br />
+<body class="dark">
+<div class="animated-intro" id="intro">
+<div class="animated-logo">
+<img alt="Logo" src="icon-192.png"/>
+<h2>Drehmomentkorrektur</h2>
+<p>Präzise. Einfach. WERA.</p>
+</div>
+</div>
+<div class="button-bar"><button id="langBtn" onclick="switchLanguage()">🌐 Sprache: DE</button><button onclick="toggleTheme()">🌓 Dark/Light Mode</button><button id="install-btn" style="display:block;">📲 App installieren</button><button class="changelog-btn" onclick="showChangelog()">📋 Changelog anzeigen</button></div><h1 id="title">Drehmomentkorrektur WERA</h1>
+<label for="insertType">Werkzeugeinsatz</label>
+<select id="insertType">
+<option value="">-- auswählen --</option>
+<option value="Joker L">Joker L (14x18)</option>
+<option value="Joker XL">Joker XL (14x18)</option>
+<option value="Joker XXL">Joker XXL (14x18)</option>
+<option value="Joker 3XL">Joker 3XL (14x18)</option>
+</select>
+<label for="sw">Schlüsselweite</label>
+<select disabled="" id="sw">
+<option value="">-- zuerst Werkzeugeinsatz wählen --</option>
+</select>
+<label for="keyType">Drehmomentschlüssel</label>
+<select id="keyType">
+<option value="">-- auswählen --</option>
+<option value="X4">WERA X4 (40–200 Nm)</option>
+<option value="X7">WERA X7 (20–100 Nm)</option>
+</select>
+<label for="ma">Drehmoment in Nm</label>
+<input id="ma" min="0" type="number"/>
+<button class="calculate-btn" onclick="calculate()">Jetzt berechnen</button><button class="reset-btn" onclick="resetFields()">Zurücksetzen</button>
+<div class="result" id="result"></div><div class="loader-bar" id="loader" style="display: none;"></div>
+<div class="warning">
+    ⚠️Achtung<br/>
+	Werte außerhalb der Schlüsselbereiche können zu dauerthaften Schäden führen!<br/>
+    Bitte beachten Sie, dass das Überschreiten der zulässigen Drehmoment- oder Schlüsselweitenbereiche irreversible Schäden verursachen kann.<br/>
+<br/>
+	Da die Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite sowie der effektive Hebelarm des Drehmomentschlüssels das Messergebnis maßgeblich beeinflussen<br/>
+	ist deshalb eine Korrektur erforderlich.<br/>
+<br/>___________________________❗❗❗❗__________________________<br/>
 	Die Verwendung dieses Tools erfolgt ausschließlich auf eigenes Risiko, und für daraus resultierende Schäden wird keinerlei Haftung übernommen.
-	<br />______________________________________________________________<br />
-  </div>
-
-  <footer>Erstellt durch Timo Burian – HDT GmbH, 46242 Bottrop</footer>
-
-  <div class="modal" id="modal" onclick="this.style.display='none'">
-    <div class="modal-content">
-      <div id="modalText"></div>
-      <button onclick="document.getElementById('modal').style.display='none'">OK</button>
-    </div>
-  </div>
-
-  <div class="modal" id="modalChangelog" onclick="this.style.display='none'">
-    <div class="modal-content">
-      <div id="modalChangelogText" style="max-height: 60vh; overflow-y: auto;"></div>
-      <button onclick="document.getElementById('modalChangelog').style.display='none'">Schließen</button>
-    </div>
-  </div>
-
-  <script>
+	<br/>______________________________________________________________<br/>
+</div>
+<footer><div>Version wird geladen…</div>Erstellt durch Timo Burian – HDT GmbH, 46242 Bottrop<div style="font-size: 0.8em; margin-top: 10px;">© 2025 – Nutzung nur unter <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></div></footer>
+<div class="modal" id="modal" onclick="this.style.display='none'">
+<div class="modal-content">
+<div id="modalText"></div>
+<button onclick="document.getElementById('modal').style.display='none'">OK</button>
+</div>
+</div>
+<div class="modal" id="modalChangelog" onclick="this.style.display='none'">
+<div class="modal-content">
+<div id="modalChangelogText" style="max-height: 60vh; overflow-y: auto;"></div>
+<button onclick="document.getElementById('modalChangelog').style.display='none'">Schließen</button>
+</div>
+</div>
+<script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
     }
@@ -184,5 +180,19 @@
         });
     }
   </script>
+<script src="install.js"></script>
+<script src="script.js"></script><script>
+fetch('./version.json')
+  .then(res => res.json())
+  .then(data => {
+    const footer = document.querySelector('footer');
+    if (footer) {
+      footer.querySelector('div').innerText = 'Version ' + data.version;
+    }
+  })
+  .catch(() => {
+    console.warn('Version konnte nicht geladen werden.');
+  });
+</script>
 </body>
 </html>
