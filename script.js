@@ -145,7 +145,7 @@ function loadChangelog() {
 
 function openTableModal() {
     const table = document.getElementById('toolTable');
-    table.innerHTML = `<tr><th>Typ</th><th>Einsatz</th><th>Joker</th><th>Schlüssel</th><th>Nm</th></tr>`;
+    table.innerHTML = `<tr><th>Typ</th><th>Größe</th><th>Joker-Typ</th><th>Schlüssel</th><th>Nm</th></tr>`;
 
     table.innerHTML += `<tr class='keine'><td>L</td><td>8L</td><td>keine</td><td>keine</td><td>keine</td></tr>`;
     table.innerHTML += `<tr><td>L</td><td>12L</td><td>Joker XL</td><td>X7</td><td>33.9</td></tr>`;
