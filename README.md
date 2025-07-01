@@ -20,7 +20,14 @@ Ein modernes, mobilfähiges Berechnungstool zur **Korrektur von Drehmomentwerten
 
 ## 🆕 Changelog
 
-### [v1.0.2] – 2025-06-25
+### [v1.0.8 Alpha] – 2025-07-01
+- Tabelle hinzugefügt (HDT Basiert)
+- Aktives Debugging mit Anzeige
+- Besucherzähler hinzugefügt
+- Logo geändert (Fav, App-PWA)
+
+````
+### old [v1.0.2 Beta] – 2025-06-24
 - Sprache wählbar DE / EN
 - PWA Integration verbessert
 - Intro + Ladebalken
@@ -29,16 +36,6 @@ Ein modernes, mobilfähiges Berechnungstool zur **Korrektur von Drehmomentwerten
 - **Automatische Versionsanzeige**
 - Anzeige für Smartphone / Tablet optimiert
 - Nutzungslizenz definiert
-
-````
-### old [v1.0.1] – 2025-06-24
-- Auswahlfelder vollständig dynamisch
-- Berechnung gemäß Formel: `Ms = Ma × Lk / (Lk + (S − Sk))
-- Modal-Warnsystem für Fehler & Hinweise
-- Layout optimiert für mobile Nutzung
-- **PWA-Integration mit Manifest & Service Worker**
-- Support für Add-to-Home auf Android und iOS über Modal
-- Warnhinweis hinzugefügt
 ````
 ---
 
