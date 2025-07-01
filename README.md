@@ -27,7 +27,7 @@ Ein modernes, mobilfähiges Berechnungstool zur **Korrektur von Drehmomentwerten
 - Logo geändert (Fav, App-PWA)
 
 
-## old [v1.0.2 Beta] – 2025-06-24
+### old [v1.0.2 Beta] – 2025-06-24
 - Sprache wählbar DE / EN
 - PWA Integration verbessert
 - Intro + Ladebalken
