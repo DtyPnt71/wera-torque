@@ -139,3 +139,22 @@ function loadChangelog() {
       console.error("Fehler beim Laden des Changelogs:", err);
     });
 }
+
+
+// Empfehlungstabelle Modal (verzögert geladen)
+
+function openTableModal() {
+    const table = document.getElementById('toolTable');
+    table.innerHTML = `<tr><th>Typ</th><th>Einsatz</th><th>Joker</th><th>Schlüssel</th><th>Nm</th></tr>`;
+
+    table.innerHTML += `<tr class='keine'><td>L</td><td>8L</td><td>keine</td><td>keine</td><td>keine</td></tr>`;
+    table.innerHTML += `<tr><td>L</td><td>12L</td><td>Joker XL</td><td>X7</td><td>33.9</td></tr>`;
+    table.innerHTML += `<tr><td>L</td><td>15L</td><td>Joker XXL</td><td>X7</td><td>41.8</td></tr>`;
+    table.innerHTML += `<tr><td>S</td><td>8S</td><td>Joker L</td><td>X7</td><td>39.3</td></tr>`;
+    table.innerHTML += `<tr><td>S</td><td>10S</td><td>Joker XL</td><td>X7</td><td>48.6</td></tr>`;
+    table.innerHTML += `<tr><td>S</td><td>12S</td><td>Joker XL</td><td>X7</td><td>57.7</td></tr>`;
+    table.innerHTML += `<tr><td>S</td><td>16S</td><td>Joker XXL</td><td>X7</td><td>74.3</td></tr>`;
+    table.innerHTML += `<tr><td>S</td><td>20S</td><td>Joker 3XL</td><td>X4</td><td>112</td></tr>`;
+    table.innerHTML += `<tr class='keine'><td>S</td><td>25S</td><td>keine</td><td>X4</td><td>keine</td></tr>`;
+    document.getElementById('modal').style.display = 'block';
+}

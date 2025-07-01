@@ -271,3 +271,140 @@ button.changelog-btn {
   font-weight: bold;
   cursor: pointer;
 }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 99;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.6);
+}
+.modal-content {
+    background-color: white;
+    color: black;
+    margin: 5% auto;
+    padding: 20px;
+    width: 95%;
+    max-width: 700px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+.modal-content h2 {
+    margin-top: 0;
+}
+.close {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+th, td {
+    border: 1px solid #999;
+    padding: 8px;
+    text-align: center;
+}
+tr.keine {
+    background-color: #f0f0f0;
+    color: #999;
+    font-style: italic;
+}
+@media (prefers-color-scheme: dark) {
+    .modal-content {
+        background-color: #1e1e1e;
+        color: white;
+    }
+    tr.keine {
+        background-color: #2a2a2a;
+        color: #777;
+    }
+}
+
+/* Tabelle im Modal modernisieren */
+.modal-content {
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    margin: 5% auto;
+    padding: 20px;
+    width: 95%;
+    max-width: 800px;
+    border-radius: 8px;
+    overflow-x: auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    font-family: 'Segoe UI', sans-serif;
+}
+.modal-content h2 {
+    color: #ffc107;
+    margin-top: 0;
+}
+.close {
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #ccc;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.95em;
+}
+th {
+    background-color: #333;
+    color: #ffc107;
+    padding: 10px;
+}
+td {
+    padding: 8px;
+    text-align: center;
+}
+tr:nth-child(even) {
+    background-color: #2a2a2a;
+}
+tr:nth-child(odd) {
+    background-color: #1e1e1e;
+}
+tr.keine {
+    background-color: #444 !important;
+    color: #999 !important;
+    font-style: italic;
+}
+
+.modal-close-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #ffc107;
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.modal-close-btn:hover {
+    background-color: #e0a800;
+}
+
+.modal-close-btn {
+    display: block;
+    margin: 20px auto 10px auto;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #ffc107;
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+.modal-close-btn:hover {
+    background-color: #e0a800;
+}

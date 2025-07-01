@@ -2,6 +2,10 @@
 
 <html lang="de">
 <head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="icon" href="icon-192.png" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+    <link rel="shortcut icon" href="icon-192.png" type="image/png">
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>Drehmomentkorrektur WERA</title>
@@ -43,7 +47,7 @@
   </style>
 <link href="styles.css" rel="stylesheet"/>
 </head>
-<body class="dark">
+<body class="dark"><button id="table-btn" onclick="openTableModal()">📋 Empfehlungstabelle anzeigen</button>
 <div class="animated-intro" id="intro">
 <div class="animated-logo">
 <img alt="Logo" src="icon-192.png"/>
@@ -51,7 +55,7 @@
 <p>Das Tool wird geladen....</p>
 </div>
 </div>
-<div class="button-bar"><button id="langBtn" onclick="switchLanguage()">🌐 Sprache: DE</button><button onclick="toggleTheme()">🌓 Dark/Light Mode</button><button id="install-btn" style="display:block;">📲 App installieren</button><button class="changelog-btn" onclick="showChangelog()">📋 Changelog anzeigen</button></div><h1 id="title">Drehmomentkorrektur WERA</h1>
+<div class="button-bar"><button id="langBtn" onclick="switchLanguage()">🌐 Sprache: DE</button><button onclick="toggleTheme()">🌓 Dark/Light Mode</button><button id="install-btn" style="display:block;">📲 App installieren</button><button class="changelog-btn" id="changelog-btn" onclick="showChangelog()">📋 Changelog anzeigen</button></div><h1 id="title">Drehmomentkorrektur WERA</h1>
 <label for="insertType">Werkzeugeinsatz</label>
 <select id="insertType">
 <option value="">-- auswählen --</option>
@@ -72,7 +76,7 @@
 </select>
 <label for="ma">Drehmoment in Nm</label>
 <input id="ma" min="0" type="number"/>
-<button class="calculate-btn" onclick="calculate()">Jetzt berechnen</button><button class="reset-btn" onclick="resetFields()">Zurücksetzen</button>
+<button class="calculate-btn" id="calculate-btn" onclick="calculate()">Jetzt berechnen</button><button class="reset-btn" id="reset-btn" onclick="resetFields()">Zurücksetzen</button>
 <div class="result" id="result"></div><div class="loader-bar" id="loader" style="display: none;"></div>
 <div class="warning">
     ⚠️Achtung<br/>
@@ -85,18 +89,33 @@
 	Die Verwendung dieses Tools erfolgt ausschließlich auf eigenes Risiko, und für daraus resultierende Schäden wird keinerlei Haftung übernommen.
 	<br/>______________________________________________________________<br/>
 </div>
-<footer><div>Version wird geladen…</div>Erstellt durch Timo Burian <div style="font-size: 0.8em; margin-top: 10px;">© 2025 – Nutzung nur unter <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></div></footer>
-<div class="modal" id="modal" onclick="this.style.display='none'">
-<div class="modal-content">
-<div id="modalText"></div>
-<button onclick="document.getElementById('modal').style.display='none'">OK</button>
+<footer><div>Version wird geladen…</div>Erstellt durch Timo Burian <div style="font-size: 0.8em; margin-top: 10px;">© 2025 – Nutzung nur unter <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></div>
+<style>
+  #visitor-counter {
+    margin-top: 10px;
+    font-size: 1.1em;
+    color: white;
+  }
+  #visitor-counter #counter-value {
+    font-weight: bold;
+    color: #00ffcc;
+    margin-left: 6px;
+  }
+  #counter-debug {
+    font-size: 0.9em;
+    color: #aaa;
+    margin-top: 4px;
+  }
+</style>
+<div id="visitor-counter">
+  👁️ Besuche:<span id="counter-value">–</span>
+<div id="counter-debug">Debug: Lade Besucherzähler...</div>
 </div>
-</div>
+</footer>
 <div class="modal" id="modalChangelog" onclick="this.style.display='none'">
 <div class="modal-content">
 <div id="modalChangelogText" style="max-height: 60vh; overflow-y: auto;"></div>
-<button onclick="document.getElementById('modalChangelog').style.display='none'">Schließen</button>
-</div>
+<button class="modal-close-btn" onclick="document.getElementById('modal').style.display='none'">Schließen</button></div>
 </div>
 <script>
     if ('serviceWorker' in navigator) {
@@ -181,7 +200,7 @@
     }
   </script>
 <script src="install.js"></script>
-<script src="script.js"></script><script>
+<script>
 fetch('./version.json')
   .then(res => res.json())
   .then(data => {
@@ -194,5 +213,33 @@ fetch('./version.json')
     console.warn('Version konnte nicht geladen werden.');
   });
 </script>
-</body>
+<script src="script.js"></script>
+<div class="modal" id="modal">
+<div class="modal-content">
+<span class="close" onclick="document.getElementById('modal').style.display='none'">×</span>
+<h2>Empfehlungstabelle</h2>
+<table id="toolTable"></table>
+<button class="modal-close-btn" onclick="document.getElementById('modal').style.display='none'">Schließen</button>
+</div>
+</div>
+<script>
+fetch('https://api.counterapi.dev/v1/wera-visit/visits/up')
+  .then(res => res.json())
+  .then(data => {
+    console.log("API Response:", data);
+    document.getElementById("counter-debug").textContent = "Debug: Zähler geladen ✔️";
+
+    const val = data?.count;
+    if (val !== undefined) {
+      document.getElementById("counter-value").textContent = val;
+    } else {
+      document.getElementById("counter-value").textContent = "–";
+      document.getElementById("counter-debug").textContent = "⚠️ Kein Wert in Antwort!";
+    }
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+    document.getElementById("counter-debug").textContent = "Debug: Fehler beim Abruf ❌";
+  });
+</script></body>
 </html>
