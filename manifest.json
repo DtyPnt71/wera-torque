@@ -1,20 +1,22 @@
 {
-    "name": "Drehmoment-Rechner",
-    "short_name": "Torque",
-    "start_url": "./",
-    "display": "fullscreen",
-    "background_color": "#ffffff",
-    "theme_color": "#0f0f0f",
-    "icons": [
-        {
-            "src": "icon-192.png",
-            "type": "image/png",
-            "sizes": "192x192"
-        },
-        {
-            "src": "icon-512.png",
-            "type": "image/png",
-            "sizes": "512x512"
-        }
-    ]
+  "name": "Drehmoment-Rechner",
+  "short_name": "Torque",
+  "start_url": "./",
+  "display": "fullscreen",
+  "background_color": "#ffffff",
+  "theme_color": "#0f0f0f",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "version": "1.0.8 Alpha",
+  "maintenance": false
 }

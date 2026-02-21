@@ -1,3 +1,239 @@
+/* === Boot/Update Overlay (aus Dosing adaptiert) === */
+(function(){
+  function qs(id){ return document.getElementById(id); }
+
+  function showBootOverlay(){
+    const overlay = qs("boot-overlay");
+    if (overlay) overlay.style.display = "flex";
+  }
+  function hideBootOverlay(){
+    const overlay = qs("boot-overlay");
+    if (overlay) overlay.style.display = "none";
+  }
+
+  function bootUI(){
+    return {
+      titleEl: qs("boot-title"),
+      statusEl: qs("boot-status"),
+      detailsEl: qs("boot-details"),
+      progressEl: qs("boot-progress-bar"),
+      progressWrap: document.querySelector(".boot-progress"),
+      actionsEl: qs("boot-actions"),
+      retryBtn: qs("boot-retry"),
+      updateBtn: qs("boot-update"),
+      laterBtn: qs("boot-later"),
+    };
+  }
+
+  function clearDetails(ui){
+    if (!ui.detailsEl) return;
+    ui.detailsEl.innerHTML = "";
+  }
+
+  function appendLine(ui, text){
+    if (!ui.detailsEl) return;
+    const el = ui.detailsEl;
+    const nearBottom = (el.scrollHeight - el.scrollTop - el.clientHeight) < 40;
+
+    const line = document.createElement("div");
+    line.className = "boot-bullet";
+    line.textContent = "• " + text;
+    el.appendChild(line);
+
+    if (nearBottom) requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
+  }
+
+  function setProgress(ui, pct){
+    const clamped = Math.max(0, Math.min(100, pct));
+    if (ui.progressEl) ui.progressEl.style.width = clamped + "%";
+    if (ui.progressWrap) ui.progressWrap.setAttribute("aria-valuenow", String(clamped));
+  }
+
+  function setStatus(ui, msg){
+    if (ui.statusEl) ui.statusEl.textContent = msg;
+    appendLine(ui, msg);
+  }
+
+  function fail(ui, title, err){
+    showBootOverlay();
+    if (ui.titleEl) ui.titleEl.textContent = "Update-Skript – Fehler";
+    if (ui.statusEl) ui.statusEl.textContent = title;
+
+    const details = err && (err.stack || err.message) ? (err.stack || err.message) : String(err || "");
+    appendLine(ui, `FEHLER: ${details || title}`);
+
+    if (ui.actionsEl) ui.actionsEl.style.display = "flex";
+    if (ui.retryBtn) ui.retryBtn.onclick = () => location.reload();
+    if (ui.updateBtn) ui.updateBtn.style.display = "none";
+    if (ui.laterBtn) ui.laterBtn.style.display = "none";
+
+    throw err instanceof Error ? err : new Error(details || title);
+  }
+
+  function renderUpdateDetails(ui, meta){
+    clearDetails(ui);
+    const lines = [];
+    if (meta?.version) lines.push(`Neue Version: ${meta.version}`);
+    if (meta?.build) lines.push(String(meta.build));
+    const added = Array.isArray(meta?.added) ? meta.added.filter(Boolean) : [];
+    const fixed = Array.isArray(meta?.fixed) ? meta.fixed.filter(Boolean) : [];
+    const removed = Array.isArray(meta?.removed) ? meta.removed.filter(Boolean) : [];
+
+    lines.forEach((t) => appendLine(ui, t));
+    if (added.length){
+      appendLine(ui, "Neu:");
+      added.slice(0,12).forEach((t) => appendLine(ui, "  " + t));
+    }
+    if (fixed.length){
+      appendLine(ui, "Fixes:");
+      fixed.slice(0,12).forEach((t) => appendLine(ui, "  " + t));
+    }
+    if (removed.length){
+      appendLine(ui, "Entfernt:");
+      removed.slice(0,12).forEach((t) => appendLine(ui, "  " + t));
+    }
+  }
+
+  // Expose updater UI for the SW update checker
+  window.__updaterUI = {
+    prompt: function(opts){
+      const ui = bootUI();
+      showBootOverlay();
+      if (ui.titleEl) ui.titleEl.textContent = "Update verfügbar";
+      clearDetails(ui);
+      setProgress(ui, 35);
+      if (ui.actionsEl) ui.actionsEl.style.display = "flex";
+      if (ui.updateBtn) ui.updateBtn.style.display = "";
+      if (ui.laterBtn) ui.laterBtn.style.display = "";
+      if (ui.retryBtn) ui.retryBtn.textContent = "Neu laden";
+
+      renderUpdateDetails(ui, opts);
+
+      if (ui.laterBtn) ui.laterBtn.onclick = () => {
+        hideBootOverlay();
+        if (typeof opts?.onLater === "function") opts.onLater();
+      };
+
+      if (ui.updateBtn) ui.updateBtn.onclick = async () => {
+        try{
+          setProgress(ui, 70);
+          setStatus(ui, "Update wird aktiviert…");
+          if (typeof opts?.onUpdate === "function") await opts.onUpdate();
+        }catch(e){
+          fail(ui, "Update fehlgeschlagen", e);
+        }
+      };
+
+      if (ui.retryBtn) ui.retryBtn.onclick = () => location.reload();
+    }
+  };
+
+  // A lightweight boot readiness promise (keeps API compatible with Dosing)
+  window.__bootReady = Promise.resolve(true);
+
+  window.addEventListener("error", (e) => {
+    try { fail(bootUI(), "Unerwarteter Fehler in der App", e.error || e.message || e); } catch(_) {}
+  });
+
+  window.addEventListener("unhandledrejection", (e) => {
+    try { fail(bootUI(), "Unerwarteter Fehler (Promise)", e.reason || e); } catch(_) {}
+  });
+})();
+
+/* === PWA Update-Check (wie Dosing) === */
+(function(){
+  if (!("serviceWorker" in navigator)) return;
+
+  (async () => {
+    const reg = await navigator.serviceWorker.register("./service-worker.js");
+
+    const VER_KEY = "wera_torque_app_version";
+    const BUILD_KEY = "wera_torque_app_build";
+
+    async function fetchVersion(){
+      try{
+        const res = await fetch("./version.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`version.json HTTP ${res.status}`);
+        const j = await res.json();
+        return {
+          version: j.version || "",
+          build: j.build || "",
+          added: Array.isArray(j.added) ? j.added : [],
+          fixed: Array.isArray(j.fixed) ? j.fixed : [],
+          removed: Array.isArray(j.removed) ? j.removed : [],
+        };
+      }catch(e){
+        return null;
+      }
+    }
+
+    function storeCurrent(meta){
+      try{
+        if (!meta) return;
+        if (meta.version) localStorage.setItem(VER_KEY, String(meta.version));
+        if (meta.build) localStorage.setItem(BUILD_KEY, String(meta.build));
+      }catch(_){}
+    }
+
+    function promptUpdate(meta){
+      if (!window.__updaterUI || typeof window.__updaterUI.prompt !== "function") return;
+
+      window.__updaterUI.prompt({
+        version: meta?.version,
+        build: meta?.build,
+        added: meta?.added,
+        fixed: meta?.fixed,
+        removed: meta?.removed,
+        onLater: () => {},
+        onUpdate: async () => {
+          await reg.update().catch(() => {});
+          if (reg.waiting){
+            reg.waiting.postMessage({ type: "SKIP_WAITING" });
+            reg.waiting.postMessage({ type: "PREFETCH_FULL" });
+          }
+          let reloaded = false;
+          navigator.serviceWorker.addEventListener("controllerchange", () => {
+            if (reloaded) return;
+            reloaded = true;
+            storeCurrent(meta);
+            location.reload();
+          });
+        }
+      });
+    }
+
+    try { await window.__bootReady; } catch(_){}
+
+    const currentMeta = await fetchVersion();
+
+    if (reg.waiting){
+      promptUpdate(currentMeta);
+    }
+
+    if (currentMeta && currentMeta.version){
+      let storedVer = "";
+      try { storedVer = localStorage.getItem(VER_KEY) || ""; } catch(_){}
+
+      if (!storedVer){
+        storeCurrent(currentMeta);
+      } else if (storedVer !== String(currentMeta.version)){
+        promptUpdate(currentMeta);
+      }
+    }
+
+    reg.addEventListener("updatefound", () => {
+      const nw = reg.installing;
+      if (!nw) return;
+      nw.addEventListener("statechange", async () => {
+        if (nw.state === "installed" && navigator.serviceWorker.controller){
+          const meta = await fetchVersion();
+          promptUpdate(meta);
+        }
+      });
+    });
+  })();
+})();
+
 let currentLang = 'de';
 
 function switchLanguage() {

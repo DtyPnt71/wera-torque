@@ -577,3 +577,152 @@ button {
   font-size: 0.92rem;
   line-height: 1.35;
 }
+
+
+/* === Boot/Update Overlay (aus Dosing adaptiert, ohne HDT-Logo) === */
+.boot-overlay{
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(1200px 600px at 50% 10%, rgba(56,189,248,0.12), transparent 60%), rgba(2,6,23,0.94);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.boot-card{
+  width: min(520px, 100%);
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 20px 18px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text);
+  text-align: center;
+}
+.boot-brand{
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 4px 0 6px 0;
+}
+.spinner{
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 4px solid rgba(148,163,184,0.28);
+  border-top-color: var(--accent);
+  animation: bootSpin 1.05s linear infinite;
+  margin: 10px auto 10px auto;
+}
+@keyframes bootSpin { to { transform: rotate(360deg); } }
+#boot-title{
+  font-size: 18px;
+  font-weight: 800;
+  margin: 8px 0 6px 0;
+}
+#boot-status{
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.boot-progress{
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(148,163,184,0.16);
+  overflow: hidden;
+  margin: 12px 0 10px 0;
+}
+.boot-progress-bar{
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(56,189,248,0.9), rgba(34,211,238,0.9));
+  transition: width 160ms ease;
+}
+.boot-details{
+  margin-top: 10px;
+  max-height: 34vh;
+  overflow: auto;
+  text-align: left;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(148,163,184,0.18);
+  background: rgba(2,6,23,0.35);
+  font-size: 12.5px;
+  color: rgba(226,232,240,0.92);
+}
+.boot-bullet{ margin: 0 0 6px 0; }
+.boot-actions{
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+/* === Wartungsmodus (wie Dosing, ohne HDT-Logo) === */
+.maintenance-overlay{
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(1200px 600px at 50% 10%, rgba(56,189,248,0.12), transparent 60%), rgba(2,6,23,0.96);
+  color: var(--text);
+  text-align: center;
+}
+body.is-maintenance .maintenance-overlay{ display:flex; }
+body.is-maintenance .app-shell{ display:none !important; }
+
+.maintenance-card{
+  width: min(560px, 100%);
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 22px 18px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.maintenance-title{
+  font-size: 18px;
+  font-weight: 850;
+  margin: 10px 0 6px 0;
+}
+.maintenance-text{
+  margin: 8px 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.maintenance-gear{
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 10px auto;
+  border-radius: 999px;
+  border: 2px solid rgba(148,163,184,0.25);
+  position: relative;
+}
+.maintenance-gear:before, .maintenance-gear:after{
+  content:"";
+  position:absolute;
+  inset: 12px;
+  border-radius: 999px;
+  border: 2px dashed rgba(56,189,248,0.55);
+  animation: gearSpin 2.8s linear infinite;
+}
+.maintenance-gear:after{
+  inset: 22px;
+  border-style: solid;
+  border-color: rgba(34,211,238,0.45);
+  animation-duration: 2.1s;
+  animation-direction: reverse;
+}
+@keyframes gearSpin { to { transform: rotate(360deg); } }

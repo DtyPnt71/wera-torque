@@ -15,6 +15,57 @@
 </head>
 <body class="dark">
 
+  <div id="boot-overlay" class="boot-overlay" aria-live="polite" style="display:none">
+    <div class="boot-card">
+      <div class="boot-brand" aria-hidden="true">WERA Torque</div>
+      <div class="spinner" aria-hidden="true"></div>
+      <h2 id="boot-title">Update</h2>
+      <div class="boot-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div id="boot-progress-bar" class="boot-progress-bar"></div>
+      </div>
+      <p id="boot-status">Initialisiere…</p>
+      <div id="boot-details" class="boot-details" aria-label="Statusdetails"></div>
+      <div id="boot-actions" class="boot-actions" style="display:none">
+        <button id="boot-retry" class="btn">Neu laden</button>
+        <button id="boot-update" class="btn primary">Update</button>
+        <button id="boot-later" class="btn ghost">Später</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="maintenanceOverlay" class="maintenance-overlay" role="status" aria-live="polite">
+    <div class="maintenance-card">
+      <div class="maintenance-gear" aria-hidden="true"></div>
+      <div class="maintenance-title">Wartungsarbeiten / Maintenance</div>
+      <p class="maintenance-text"><strong>DE:</strong> Derzeit werden Wartungsarbeiten durchgeführt. Bitte versuchen Sie es später erneut.</p>
+      <p class="maintenance-text"><strong>EN:</strong> We are currently performing maintenance. Please try again later.</p>
+      <button id="maintenanceReload" class="btn primary" type="button">Neu laden</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      function enableMaintenance(){
+        document.body.classList.add('is-maintenance');
+        var btn = document.getElementById('maintenanceReload');
+        if (btn && !btn.__bound){
+          btn.__bound = true;
+          btn.addEventListener('click', function(){ location.reload(); });
+        }
+      }
+      async function checkMaintenance(){
+        try{
+          var r = await fetch('manifest.json', { cache: 'no-store' });
+          var m = await r.json();
+          if (m && m.maintenance === true) enableMaintenance();
+        }catch(e){}
+      }
+      checkMaintenance();
+      // also re-check when coming back online
+      window.addEventListener('online', checkMaintenance);
+    })();
+  </script>
+
+
 <div class="app-shell">
 
 <div class="animated-intro" id="intro" aria-hidden="true">
@@ -134,12 +185,7 @@
 <div id="modalChangelogText" style="max-height: 60vh; overflow-y: auto;"></div>
 <button class="modal-close-btn" onclick="document.getElementById('modal').style.display='none'">Schließen</button></div>
 </div>
-<script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-
-    const sizes = {
+<script>const sizes = {
       "Joker L": { "16": 44.6, "17": 46.7, "18": 48.2, "19": 49.1 },
       "Joker XL": { "19": 51.6, "20": 53.6, "21": 55.4, "22": 56.7, "23": 56.7, "24": 56.7 },
       "Joker XXL": { "24": 62.2, "27": 68, "30": 70.2, "32": 70.4 },
