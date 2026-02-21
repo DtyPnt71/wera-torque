@@ -11,43 +11,12 @@
 <title>Drehmomentkorrektur WERA</title>
 <link href="manifest.json" rel="manifest"/>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<style>
-    body { background: #121212; color: #fff; font-family: sans-serif; padding: 20px; max-width: 500px; margin: auto; }
-    h1 { text-align: center; }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    select, input, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: none; background: #1e1e1e; color: #fff; }
-    button { background-color: #ff5252; margin-top: 20px; cursor: pointer; }
-    #result { margin-top: 20px; color: red; font-size: 1.2em; text-align: center; }
-    .warning { margin-top: 30px; color: #ffc107; font-size: 0.9em; text-align: center; }
-    footer { margin-top: 40px; text-align: center; font-size: 0.75em; color: #bbb; }
-    .modal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0,0,0,0.7);
-  overflow-y: auto;
-}
-    .modal-content {
-  background: #222;
-  padding: 20px;
-  border-radius: 5px;
-  width: 90%;
-  max-width: 500px;
-  text-align: left;
-  color: #eee;
-  margin: 20px auto;
-}
-    .modal-content button { margin-top: 15px; background: #ff5252; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; width: 100%; }
-    .modal-content h1, h2, h3 { color: #ffcc00; }
-    .modal-content ul, ol { margin-left: 20px; }
-  </style>
 <link href="styles.css" rel="stylesheet"/>
 </head>
-<body class="dark"><button id="table-btn" onclick="openTableModal()">📋 Empfehlungstabelle anzeigen</button>
+<body class="dark">
+
+<div class="app-shell">
+
 <div class="animated-intro" id="intro">
 <div class="animated-logo">
 <img alt="Logo" src="icon-192.png"/>
@@ -55,30 +24,82 @@
 <p>Das Tool wird geladen....</p>
 </div>
 </div>
-<div class="button-bar"><button id="langBtn" onclick="switchLanguage()">🌐 Sprache: DE</button><button onclick="toggleTheme()">🌓 Dark/Light Mode</button><button id="install-btn" style="display:block;">📲 App installieren</button><button class="changelog-btn" id="changelog-btn" onclick="showChangelog()">📋 Changelog anzeigen</button></div><h1 id="title">Drehmomentkorrektur WERA</h1>
-<label for="insertType">Werkzeugeinsatz</label>
-<select id="insertType">
+
+<main class="container">
+  <header class="app-header">
+    <div class="brand">
+      <img class="brand-logo" src="icon-192.png" alt="WERA" />
+      <div class="brand-text">
+        <div class="brand-title" id="title">Drehmomentkorrektur WERA</div>
+        <div class="brand-subtitle">Tool</div>
+      </div>
+    </div>
+
+    <div class="toolbar" role="group" aria-label="Aktionen">
+      <button id="table-btn" class="btn-ghost" onclick="openTableModal()">📋 Tabelle</button>
+      <button id="langBtn" class="btn-ghost" onclick="switchLanguage()">🌐 Sprache: DE</button>
+      <button class="btn-ghost" onclick="toggleTheme()">🌓 Dark/Light</button>
+      <button id="install-btn" class="btn-primary" style="display:block;">📲 Installieren</button>
+      <button class="btn-ghost" id="changelog-btn" onclick="showChangelog()">📋 Changelog</button>
+    </div>
+  </header>
+
+  <section class="card form-section">
+    <div class="field">
+      <label for="insertType">Werkzeugeinsatz</label>
+      <div class="select">
+        <select id="insertType">
 <option value="">-- auswählen --</option>
 <option value="Joker L">Joker L (14x18)</option>
 <option value="Joker XL">Joker XL (14x18)</option>
 <option value="Joker XXL">Joker XXL (14x18)</option>
 <option value="Joker 3XL">Joker 3XL (14x18)</option>
-</select>
-<label for="sw">Schlüsselweite</label>
-<select disabled="" id="sw">
+        </select>
+        <span class="chev" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="sw">Schlüsselweite</label>
+      <div class="select">
+        <select disabled="" id="sw">
 <option value="">-- zuerst Werkzeugeinsatz wählen --</option>
-</select>
-<label for="keyType">Drehmomentschlüssel</label>
-<select id="keyType">
+        </select>
+        <span class="chev" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="keyType">Drehmomentschlüssel</label>
+      <div class="select">
+        <select id="keyType">
 <option value="">-- auswählen --</option>
 <option value="X4">WERA X4 (40–200 Nm)</option>
 <option value="X7">WERA X7 (20–100 Nm)</option>
-</select>
-<label for="ma">Drehmoment in Nm</label>
-<input id="ma" min="0" type="number"/>
-<button class="calculate-btn" id="calculate-btn" onclick="calculate()">Jetzt berechnen</button><button class="reset-btn" id="reset-btn" onclick="resetFields()">Zurücksetzen</button>
-<div class="result" id="result"></div><div class="loader-bar" id="loader" style="display: none;"></div>
-<div class="warning">
+        </select>
+        <span class="chev" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="ma">Drehmoment in Nm</label>
+      <input id="ma" min="0" type="number" inputmode="decimal" />
+    </div>
+  </section>
+
+  <section class="card action-section">
+    <button class="btn-primary calculate-btn" id="calculate-btn" onclick="calculate()">Jetzt berechnen</button>
+    <button class="btn-ghost reset-btn" id="reset-btn" onclick="resetFields()">Zurücksetzen</button>
+    <div class="loader-bar" id="loader" style="display: none;"></div>
+  </section>
+
+  <section class="card result-section" aria-live="polite">
+    <span class="result-label">Ergebnis</span>
+    <span class="value-chip" id="result">–</span>
+  </section>
+
+  <section class="card warning-section">
+    <div class="warning">
     ⚠️Achtung<br/>
 	Werte außerhalb der Schlüsselbereiche können zu dauerthaften Schäden führen!<br/>
     Bitte beachten Sie, dass das Überschreiten der zulässigen Drehmoment- oder Schlüsselweitenbereiche irreversible Schäden verursachen kann.<br/>
@@ -88,30 +109,23 @@
 <br/>___________________________❗❗❗❗__________________________<br/>
 	Die Verwendung dieses Tools erfolgt ausschließlich auf eigenes Risiko, und für daraus resultierende Schäden wird keinerlei Haftung übernommen.
 	<br/>______________________________________________________________<br/>
-</div>
-<footer><div>Version wird geladen…</div>Erstellt durch Timo Burian <div style="font-size: 0.8em; margin-top: 10px;">© 2025 – Nutzung nur unter <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank">CC BY-NC-ND 4.0</a></div>
-<style>
-  #visitor-counter {
-    margin-top: 10px;
-    font-size: 1.1em;
-    color: white;
-  }
-  #visitor-counter #counter-value {
-    font-weight: bold;
-    color: #00ffcc;
-    margin-left: 6px;
-  }
-  #counter-debug {
-    font-size: 0.9em;
-    color: #aaa;
-    margin-top: 4px;
-  }
-</style>
-<div id="visitor-counter">
-  👁️ Besuche:<span id="counter-value">–</span>
-<div id="counter-debug">Debug: Lade Besucherzähler...</div>
-</div>
-</footer>
+    </div>
+  </section>
+
+  <footer class="card footer">
+    <div class="footer-row">
+      <div>Version wird geladen…</div>
+      <div>Erstellt durch Timo Burian</div>
+    </div>
+    <div class="footer-row footer-small">© 2025 – Nutzung nur unter <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noreferrer">CC BY-NC-ND 4.0</a></div>
+
+    <div id="visitor-counter" class="visitor-counter">
+      👁️ Besuche:<span id="counter-value">–</span>
+      <div id="counter-debug" class="counter-debug">Debug: Lade Besucherzähler...</div>
+    </div>
+  </footer>
+
+</main>
 <div class="modal" id="modalChangelog" onclick="this.style.display='none'">
 <div class="modal-content">
 <div id="modalChangelogText" style="max-height: 60vh; overflow-y: auto;"></div>
@@ -241,5 +255,9 @@ fetch('https://api.counterapi.dev/v1/wera-visit/visits/up')
     console.error("Fetch error:", err);
     document.getElementById("counter-debug").textContent = "Debug: Fehler beim Abruf ❌";
   });
-</script></body>
+</script>
+
+</div>
+
+</body>
 </html>
