@@ -100,15 +100,16 @@
 
   <section class="card warning-section">
     <div class="warning">
-    ⚠️Achtung<br/>
-	Werte außerhalb der Schlüsselbereiche können zu dauerthaften Schäden führen!<br/>
-    Bitte beachten Sie, dass das Überschreiten der zulässigen Drehmoment- oder Schlüsselweitenbereiche irreversible Schäden verursachen kann.<br/>
-<br/>
-	Da die Werkzeugeinsatzlänge, Ausschwenkwinkel bei variabler Schlüsselweite, sowie der effektive Hebelarm des Drehmomentschlüssels, das Messergebnis maßgeblich beeinflussen,<br/>
-	ist deshalb eine Korrektur erforderlich.<br/>
-<br/>___________________________❗❗❗❗__________________________<br/>
-	Die Verwendung dieses Tools erfolgt ausschließlich auf eigenes Risiko, und für daraus resultierende Schäden wird keinerlei Haftung übernommen.
-	<br/>______________________________________________________________<br/>
+      <div class="warning-title">⚠️ Hinweis</div>
+      <div class="warning-text">Bitte nutze nur Werte innerhalb der zulässigen Bereiche – außerhalb der Spezifikation sind Schäden möglich.</div>
+      <details class="warning-details">
+        <summary>Mehr Informationen</summary>
+        <div class="warning-details-body">
+          Werkzeugeinsatzlänge, Ausschwenkwinkel (bei variabler Schlüsselweite) sowie der effektive Hebelarm beeinflussen das Messergebnis maßgeblich – daher kann eine Korrektur erforderlich sein.
+          <br/><br/>
+          Die Verwendung dieses Tools erfolgt ausschließlich auf eigenes Risiko; für daraus resultierende Schäden wird keinerlei Haftung übernommen.
+        </div>
+      </details>
     </div>
   </section>
 
@@ -119,9 +120,10 @@
     </div>
     <div class="footer-row footer-small">© 2025 – Nutzung nur unter <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noreferrer">CC BY-NC-ND 4.0</a></div>
 
-    <div id="visitor-counter" class="visitor-counter">
-      👁️ Besuche:<span id="counter-value">–</span>
-      <div id="counter-debug" class="counter-debug">Debug: Lade Besucherzähler...</div>
+    <div id="visitor-counter" class="visitor-counter" aria-label="Besucherzähler">
+      <span class="visitor-eye" aria-hidden="true">👁️</span>
+      <span class="visitor-label">Besuche</span>
+      <span id="counter-value" class="visitor-pill">–</span>
     </div>
   </footer>
 
@@ -240,20 +242,13 @@ fetch('./version.json')
 fetch('https://api.counterapi.dev/v1/wera-visit/visits/up')
   .then(res => res.json())
   .then(data => {
-    console.log("API Response:", data);
-    document.getElementById("counter-debug").textContent = "Debug: Zähler geladen ✔️";
-
     const val = data?.count;
     if (val !== undefined) {
       document.getElementById("counter-value").textContent = val;
-    } else {
-      document.getElementById("counter-value").textContent = "–";
-      document.getElementById("counter-debug").textContent = "⚠️ Kein Wert in Antwort!";
     }
   })
-  .catch(err => {
-    console.error("Fetch error:", err);
-    document.getElementById("counter-debug").textContent = "Debug: Fehler beim Abruf ❌";
+  .catch(() => {
+    // Besucherzähler ist optional – bei Fehlern still ignorieren
   });
 </script>
 

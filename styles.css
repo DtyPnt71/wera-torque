@@ -306,7 +306,13 @@ button {
 
 .visitor-counter {
   margin-top: 0.75rem;
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+  opacity: 0.85;
 }
 
 .counter-debug {
@@ -496,4 +502,46 @@ button {
     justify-content: center;
     gap: 1rem;
   }
+}
+
+
+/* Footer meta (Besucherzähler) */
+.visitor-eye { font-size: 0.95rem; }
+.visitor-label { letter-spacing: 0.01em; }
+.visitor-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(2, 6, 23, 0.55);
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* Warning compact layout */
+.warning-title {
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.warning-text {
+  color: var(--text);
+  opacity: 0.95;
+}
+.warning-details {
+  margin-top: 0.6rem;
+}
+.warning-details > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.9rem;
+  user-select: none;
+}
+.warning-details-body {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.35;
 }
