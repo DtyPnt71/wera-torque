@@ -17,12 +17,13 @@
 
 <div class="app-shell">
 
-<div class="animated-intro" id="intro">
-<div class="animated-logo">
-<img alt="Logo" src="icon-192.png"/>
-<h2>Drehmomentkorrektur</h2>
-<p>Das Tool wird geladen....</p>
-</div>
+<div class="animated-intro" id="intro" aria-hidden="true">
+  <div class="intro-card" role="status" aria-live="polite">
+    <div class="intro-mark" aria-hidden="true">W</div>
+    <h2>Drehmomentkorrektur</h2>
+    <p>Tool wird gestartet…</p>
+    <div class="intro-progress" aria-hidden="true"><span></span></div>
+  </div>
 </div>
 
 <main class="container">
