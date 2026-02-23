@@ -1,3 +1,9 @@
 {
-  "version": "1.0.8 Alpha"
+  "version": "1.0.9 Alpha",
+  "added": [
+    "Update-Logik wie im Dosing (kontrollierte Aktivierung)"
+  ],
+  "fixed": [
+    "Update-Overlay: kein Endlos-Update/Reload mehr"
+  ]
 }
