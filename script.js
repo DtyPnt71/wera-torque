@@ -110,16 +110,22 @@
       renderUpdateDetails(ui, opts);
 
       if (ui.laterBtn) ui.laterBtn.onclick = () => {
+        if (window.__torqueUpdateInProgress) return;
         hideBootOverlay();
         if (typeof opts?.onLater === "function") opts.onLater();
       };
 
       if (ui.updateBtn) ui.updateBtn.onclick = async () => {
         try{
+          ui.updateBtn.disabled = true;
+          if (ui.laterBtn) ui.laterBtn.disabled = true;
           setProgress(ui, 70);
           setStatus(ui, "Update wird aktiviert…");
           if (typeof opts?.onUpdate === "function") await opts.onUpdate();
-        }catch(e){
+        }
+        catch(e){
+          try { ui.updateBtn.disabled = false; } catch(_){ }
+          try { if (ui.laterBtn) ui.laterBtn.disabled = false; } catch(_){ }
           fail(ui, "Update fehlgeschlagen", e);
         }
       };
@@ -141,7 +147,7 @@
 })();
 
 /* === PWA Update-Check (wie Dosing) === */
-(function(){
+(function () {
   if (!("serviceWorker" in navigator)) return;
 
   (async () => {
@@ -150,32 +156,78 @@
     const VER_KEY = "wera_torque_app_version";
     const BUILD_KEY = "wera_torque_app_build";
 
-    async function fetchVersion(){
-      try{
+    async function fetchVersion() {
+      try {
         const res = await fetch("./version.json", { cache: "no-store" });
         if (!res.ok) throw new Error(`version.json HTTP ${res.status}`);
         const j = await res.json();
         return {
           version: j.version || "",
           build: j.build || "",
-          added: Array.isArray(j.added) ? j.added : [],
-          fixed: Array.isArray(j.fixed) ? j.fixed : [],
-          removed: Array.isArray(j.removed) ? j.removed : [],
+          // Preferred: categorized release notes (accept common variants/casing)
+          added: Array.isArray(j.added) ? j.added : (Array.isArray(j.Added) ? j.Added : []),
+          fixed: Array.isArray(j.fixed) ? j.fixed : (Array.isArray(j.Fixed) ? j.Fixed : (Array.isArray(j.fixes) ? j.fixes : [])),
+          removed: Array.isArray(j.removed) ? j.removed : (Array.isArray(j.Removed) ? j.Removed : []),
+          // Backward compat
+          changes: Array.isArray(j.changes) ? j.changes : (Array.isArray(j.Changes) ? j.Changes : []),
         };
-      }catch(e){
-        return null;
+      } catch (e) {
+        return null; // offline or blocked
       }
     }
 
-    function storeCurrent(meta){
-      try{
+    function storeCurrent(meta) {
+      try {
         if (!meta) return;
         if (meta.version) localStorage.setItem(VER_KEY, String(meta.version));
         if (meta.build) localStorage.setItem(BUILD_KEY, String(meta.build));
-      }catch(_){}
+      } catch (_) {}
     }
 
-    function promptUpdate(meta){
+    // Wait until a newly installed SW is actually in "waiting".
+    // This prevents the endless "Update wird aktiviert…" state when reg.update() hasn't finished yet.
+    async function waitForWaiting(reg, timeoutMs = 15000) {
+      if (reg.waiting) return reg.waiting;
+
+      return await new Promise((resolve) => {
+        let done = false;
+
+        const finish = (sw) => {
+          if (done) return;
+          done = true;
+          cleanup();
+          resolve(sw || null);
+        };
+
+        const timer = setTimeout(() => finish(null), timeoutMs);
+
+        const onUpdateFound = () => {
+          const nw = reg.installing;
+          if (!nw) return;
+
+          const onState = () => {
+            if (nw.state === "installed") {
+              finish(reg.waiting || null);
+            }
+          };
+
+          nw.addEventListener("statechange", onState);
+          onState();
+        };
+
+        const cleanup = () => {
+          clearTimeout(timer);
+          try { reg.removeEventListener("updatefound", onUpdateFound); } catch (_) {}
+        };
+
+        reg.addEventListener("updatefound", onUpdateFound);
+
+        // If an update is already being installed, hook into it.
+        if (reg.installing) onUpdateFound();
+      });
+    }
+
+    function promptUpdate(meta) {
       if (!window.__updaterUI || typeof window.__updaterUI.prompt !== "function") return;
 
       window.__updaterUI.prompt({
@@ -184,13 +236,22 @@
         added: meta?.added,
         fixed: meta?.fixed,
         removed: meta?.removed,
-        onLater: () => {},
+        changes: meta?.changes,
+        onLater: () => {
+          // nothing; user stays on current version
+        },
         onUpdate: async () => {
+          // Trigger SW update lifecycle and activate waiting worker
           await reg.update().catch(() => {});
-          if (reg.waiting){
-            reg.waiting.postMessage({ type: "SKIP_WAITING" });
-            reg.waiting.postMessage({ type: "PREFETCH_FULL" });
+
+          // If an update is already waiting now, activate it
+          const waiting = await waitForWaiting(reg, 15000);
+          if (waiting) {
+            try { waiting.postMessage({ type: "SKIP_WAITING" }); } catch (_) {}
+            try { waiting.postMessage({ type: "PREFETCH_FULL" }); } catch (_) {}
           }
+
+          // Reload once the new SW takes control
           let reloaded = false;
           navigator.serviceWorker.addEventListener("controllerchange", () => {
             if (reloaded) return;
@@ -198,34 +259,41 @@
             storeCurrent(meta);
             location.reload();
           });
-        }
+        },
       });
     }
 
-    try { await window.__bootReady; } catch(_){}
+    // Wait until the boot screen is finished, then do update check
+    try { await window.__bootReady; } catch (_) {}
 
+    // 1) If a worker is already waiting: offer update immediately
     const currentMeta = await fetchVersion();
-
-    if (reg.waiting){
+    if (reg.waiting) {
       promptUpdate(currentMeta);
     }
 
-    if (currentMeta && currentMeta.version){
+    // 2) If version.json changed: only offer update after a new SW is actually available (like Dosing releases)
+    if (currentMeta && currentMeta.version) {
       let storedVer = "";
-      try { storedVer = localStorage.getItem(VER_KEY) || ""; } catch(_){}
+      try { storedVer = localStorage.getItem(VER_KEY) || ""; } catch (_) {}
 
-      if (!storedVer){
+      // First start: store version, don't prompt
+      if (!storedVer) {
         storeCurrent(currentMeta);
-      } else if (storedVer !== String(currentMeta.version)){
-        promptUpdate(currentMeta);
+      } else if (storedVer !== String(currentMeta.version)) {
+        await reg.update().catch(() => {});
+        if (reg.waiting) {
+          promptUpdate(currentMeta);
+        }
       }
     }
 
+    // 3) updatefound -> when installed & there is a controller, offer update
     reg.addEventListener("updatefound", () => {
       const nw = reg.installing;
       if (!nw) return;
       nw.addEventListener("statechange", async () => {
-        if (nw.state === "installed" && navigator.serviceWorker.controller){
+        if (nw.state === "installed" && navigator.serviceWorker.controller) {
           const meta = await fetchVersion();
           promptUpdate(meta);
         }
@@ -233,6 +301,7 @@
     });
   })();
 })();
+
 
 let currentLang = 'de';
 
